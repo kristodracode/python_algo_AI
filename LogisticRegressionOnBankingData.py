@@ -2,8 +2,12 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import RFE
 import matplotlib.pyplot as plt
+from imblearn.over_sampling import SMOTE
+
 df=pd.read_csv("C:/Users/Yogesh Kumar Ahuja/Desktop/data2.csv")
 # print(df['education'].unique())
 df['education']=np.where(df['education']=="basic.9y","Basic",df['education'])
@@ -33,8 +37,48 @@ for i in cat_var:
     cat_list=pd.get_dummies(df[i],prefix=i)
     # print(cat_list)
     df1=df.join(cat_list)
-    print(df1)
+    df=df1
+    # print(df.columns.values)
+    # print(df)
+
+# print(df)
+# print(df.columns.values)
+cat_vars=['job','marital','education','contact','month','day_of_week','poutcome']
+data_vars=df.columns.values.tolist()
+w=[i for i in data_vars if i not in cat_vars]
+data_final=df[w]
+# print(data_final.columns.values)
+# pd.crosstab(data_final.age,data_final.marital_single).plot(kind='line')
+# plt.show()
 #
+Y=['y']
+data_varsy=data_final.columns.values.tolist()
+x=[i for i in data_varsy if i not in Y]
+data_finalx=df[x]
+print(data_finalx.columns.values)
+
+
+X=data_finalx.loc[:, data_finalx.columns!='y']
+Y=data_finalx.loc[:, data_finalx.columns=='y']
+os=SMOTE(random_state=0)
+X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.3,random_state=0)
+col=X_train.columns
+print("this is  ytrain",Y_train)
+os_data_X,os_data_Y=os.fit_sample(X_train,Y_train)
+# =os.fit_sample(X_train,Y_train)
+os_data_X=pd.DataFrame(data=os_data_X,columns=col)
+os_data_Y=pd.DataFrame(data=os_data_Y,columns='y')
+print(len(os_data_X))
+
+
+lr=LogisticRegression()
+lr.fit(X_train,Y_train)
+rfe=RFE(lr,500)
+print(rfe)
+
+
+
+
 # dict={1:"rahul",2:"sanjay",3:"ajay"}
 # print(dict.get(1))
 # for i in dict:
