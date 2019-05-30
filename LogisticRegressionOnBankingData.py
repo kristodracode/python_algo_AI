@@ -43,7 +43,7 @@ for i in cat_var:
 
 # print(df)
 # print(df.columns.values)
-cat_vars=['job','marital','education','contact','month','day_of_week','poutcome']
+cat_vars=['job','marital','education','contact','month','day_of_week','poutcome','default','housing','loan']
 data_vars=df.columns.values.tolist()
 w=[i for i in data_vars if i not in cat_vars]
 data_final=df[w]
@@ -58,28 +58,35 @@ data_finalx=df[x]
 print(data_finalx.columns.values)
 
 
-X=data_finalx.loc[:, data_finalx.columns!='y']
-Y=data_finalx.loc[:, data_finalx.columns=='y']
+X=data_final.loc[:, data_final.columns!='y']
+Y=data_final.loc[:, data_final.columns=='y']
+print(Y)
+print("This is x",X)
 os=SMOTE(random_state=0)
 X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.3,random_state=0)
 col=X_train.columns
+print("this is  xtrain",X_train)
+print("this is  xtest",X_test)
 print("this is  ytrain",Y_train)
-os_data_X,os_data_Y=os.fit_sample(X_train,Y_train)
+print("this is  ytest",Y_test)
+os_data_X,os_data_Y=os.fit_sample(X_train,Y_train.values.ravel())
 # =os.fit_sample(X_train,Y_train)
-os_data_X=pd.DataFrame(data=os_data_X,columns=col)
-os_data_Y=pd.DataFrame(data=os_data_Y,columns='y')
-print(len(os_data_X))
+print("This is os vala datax",os_data_X)
+print("Line ends here")
+print("This is os vala datay",os_data_Y)
+print("Line ends here")
+# os_data_X=pd.DataFrame(data=os_data_X,columns=col)
+# os_data_Y=pd.DataFrame(data=os_data_Y,columns='y')
+# print(len(os_data_X))
 
 
 lr=LogisticRegression()
-lr.fit(X_train,Y_train)
+qu=lr.fit(X_train,Y_train.values.ravel())
 rfe=RFE(lr,500)
 print(rfe)
+print(qu)
 
+Y_predict=lr.predict(X_test)
+print(Y_predict)
+print('{:.2f}'.format(lr.score(X_test,Y_test)))
 
-
-
-# dict={1:"rahul",2:"sanjay",3:"ajay"}
-# print(dict.get(1))
-# for i in dict:
-#     print(dict.get(i))
